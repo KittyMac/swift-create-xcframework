@@ -5,6 +5,7 @@
 # Created by Rob Amos on 7/5/20.
 #
 
+PROJECTNAME := $(shell basename `pwd`)
 PRODUCT := swift-create-xcframework
 INSTALL_DIR := /usr/local/bin
 
@@ -19,7 +20,10 @@ build: build-debug
 # Release Builds
 
 build-release: $(wildcard Sources/*/*.swift)
-	swift build $(BUILD_FLAGS) --configuration release
+	swift build --triple arm64-apple-macosx $(BUILD_FLAGS) --configuration release
+	swift build --triple x86_64-apple-macosx $(BUILD_FLAGS) --configuration release
+	-rm .build/${PROJECTNAME}
+	lipo -create -output .build/${PROJECTNAME} .build/arm64-apple-macosx/release/${PROJECTNAME} .build/x86_64-apple-macosx/release/${PROJECTNAME}
 
 install: build-release
 	cp .build/release/swift-create-xcframework $(INSTALL_DIR)/$(PRODUCT)
